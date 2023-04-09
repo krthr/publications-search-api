@@ -4,7 +4,9 @@ import Image from 'App/Models/Image'
 import Logger from '@ioc:Adonis/Core/Logger'
 import Publication from 'App/Models/Publication'
 import { getImageEmbedding } from 'App/Services/Ml'
+import { publicationsSearchBucket } from 'App/Services/Firebase'
 import { readAndParseImage } from 'App/Services/Sharp'
+import { nanoid } from 'nanoid'
 
 export default class PublicationsController {
   public async store({ request, response }: HttpContextContract) {
@@ -35,17 +37,29 @@ export default class PublicationsController {
         continue
       }
 
+      const mediaPath = `images/${nanoid(10)}.jpg`
+      await publicationsSearchBucket.file(mediaPath).save(parsedImage.jpgBuff, { public: true })
+
       await publication.related('images').create({
         embedding,
-        mediaPath: '',
+        mediaPath,
         mediaPreview: parsedImage.preview,
+        mediaMetadata: parsedImage.metadata,
       })
     }
 
     return {
       publication,
       images: await Image.query()
-        .select(['id', 'media_path', 'media_preview', 'tags', 'created_at', 'updated_at'])
+        .select([
+          'id',
+          'media_path',
+          'media_preview',
+          'media_metadata',
+          'tags',
+          'created_at',
+          'updated_at',
+        ])
         .where('publication_id', publication.id),
     }
   }
@@ -79,6 +93,7 @@ export default class PublicationsController {
         'tags',
         'media_path',
         'media_preview',
+        'media_metadata',
         Database.raw(`1 - (embedding <=> '${embeddingArray}') as distance`)
       )
       .orderBy('distance', 'desc')

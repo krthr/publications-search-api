@@ -9,12 +9,14 @@ export async function readAndParseImage(filepath: string) {
     const buff = await readFile(filepath)
     const sharp = Sharp(buff).jpeg()
 
-    const jpgBuff = await sharp.resize(800, null).toBuffer()
-    const previewBuff = await sharp.resize(2, null).toBuffer()
+    const { data: jpgBuff, info: metadata } = await sharp
+      .resize(800, null)
+      .toBuffer({ resolveWithObject: true })
 
+    const previewBuff = await sharp.resize(2, null).toBuffer()
     const preview = 'data:image/jpg;base64,' + previewBuff.toString('base64')
 
-    return { jpgBuff, preview }
+    return { jpgBuff, preview, metadata }
   } catch (error: any) {
     Logger.error({ filepath }, error)
     return undefined

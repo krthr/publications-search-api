@@ -7,9 +7,17 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.bigIncrements('id')
 
-      table.bigInteger('publication_id').references('id').inTable('publications').notNullable()
+      table
+        .bigInteger('publication_id')
+        .references('id')
+        .inTable('publications')
+        .notNullable()
+        .onDelete('CASCADE')
+
       table.text('media_path').notNullable()
       table.text('media_preview')
+      table.json('media_metadata').defaultTo('{}')
+
       table.specificType('embedding', 'vector(512)').notNullable()
       table.specificType('tags', 'text[]').defaultTo('{}')
 
