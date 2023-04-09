@@ -1,3 +1,10 @@
 // import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 
-export default class ImagesController {}
+import Image from 'App/Models/Image'
+
+export default class ImagesController {
+  public async index() {
+    const images = await Image.query().preload('publication')
+    return { images }
+  }
+}

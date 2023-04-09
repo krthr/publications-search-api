@@ -10,13 +10,29 @@ export default class Image extends BaseModel {
   public publication: BelongsTo<typeof Publication>
 
   @column()
+  public publicationId: number
+
+  @column()
   public mediaPath: string
 
   @column()
+  public mediaPreview: string
+
+  @column()
+  public distance?: number
+
+  @column({
+    prepare(value: number[]) {
+      return JSON.stringify(value)
+    },
+    serialize(value: string) {
+      return JSON.parse(value)
+    },
+  })
   public embedding: number[]
 
   @column()
-  public tags: string[] = []
+  public tags: string[]
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime

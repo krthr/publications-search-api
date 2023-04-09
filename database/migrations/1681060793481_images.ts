@@ -9,6 +9,7 @@ export default class extends BaseSchema {
 
       table.bigInteger('publication_id').references('id').inTable('publications').notNullable()
       table.text('media_path').notNullable()
+      table.text('media_preview')
       table.specificType('embedding', 'vector(512)').notNullable()
       table.specificType('tags', 'text[]').defaultTo('{}')
 

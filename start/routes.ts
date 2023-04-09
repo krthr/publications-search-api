@@ -23,3 +23,8 @@ import Route from '@ioc:Adonis/Core/Route'
 Route.get('/', async () => {
   return { hello: 'world' }
 })
+
+Route.group(() => {
+  Route.resource('publications', 'PublicationsController').only(['store'])
+  Route.post('publications/search', 'PublicationsController.search')
+}).prefix('api')
